@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DuckDuckGo Search & Pinned Sites</title>
+<style>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  /* Background color can be overridden by CSS variable */
+  background-color: #f0f0f0; 
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* Make the container relative */
+}
+
+.search-bar {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 15px 20px; 
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  width: 150%;
+  max-width: 600px; 
+  border: none; /* Removed border */
+}
+
+.search-bar input[type="text"] {
+  border: none;
+  padding: 5px 10px;
+  font-size: 16px; 
+  flex-grow: 1; 
+  border-radius: 20px 0 0 20px; 
+  background-color: #f0f0f0; /* Light gray background */
+  border: 1px solid #ccc; /* Subtle border for input */
+  color: #000; /* Set text color to black */
+}
+
+.search-bar button {
+  background-color: transparent; 
+  border: none;
+  padding: 10px 15px; 
+  cursor: pointer;
+}
+
+.search-bar button img {
+  width: 24px; 
+  height: 24px; 
+  border-radius: 50%; 
+  background-color: #ccc; 
+  padding: 3px; 
+}
+
+.pinned-sites {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 30px; 
+}
+
+.pinned-site {
+  width: 100px; 
+  height: 100px; 
+  margin: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  cursor: pointer; 
+  position: relative; 
+  transition: transform 0.2s ease, background-color 0.2s ease; 
+}
+
+.pinned-site:hover {
+  transform: scale(1.1); 
+  background-color: rgba(255, 255, 255, 0.9); 
+}
+
+.pinned-site-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  width: 100%; 
+  height: 100%; 
+  background-color: #fff; 
+  border-radius: 5px; 
+  overflow: hidden; 
+}
+
+.pinned-site img {
+  width: 70%; 
+  height: auto; 
+  object-fit: cover; 
+}
+
+.pinned-site a {
+  text-decoration: none;
+  color: #000; 
+  font-size: 12px; 
+  position: absolute; 
+  bottom: 10px; 
+  left: 0; 
+  right: 0; 
+  margin: 0 auto; 
+}
+
+/* Add this CSS for the background image */
+.background-container {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; 
+  z-index: -1; 
+}
+
+.background-image {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background-image: url('/home/demuriel/Pictures/GhTlgnCX0AAC2DI_waifu2x_noise0_scale4x.png'); 
+  background-size: cover; 
+  background-position: center center; 
+  background-repeat: no-repeat;
+}
+</style>
+</head>
+<body>
+
+<div class="background-container">
+  <div class="background-image"></div> 
+</div>
+
+<div class="container"> 
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search..." onkeypress="handleKeyPress(event)" /> 
+    <button><img src="magnifier.svg" alt="Search"></button> 
+  </div>
+
+  <div class="pinned-sites" id="pinnedSitesContainer">
+  </div>
+</div>
+
+<script>
+function handleKeyPress(event) {
+  if (event.key === 'Enter') {
+    search();
+  }
+}
+
+function search() {
+  var searchInput = document.getElementById("searchInput");
+  var searchTerm = searchInput.value;
+
+  // Redirect to DuckDuckGo search
+  window.location.href = "https://duckduckgo.com/?q=" + searchTerm;
+}
+
+// Hardcoded pinned sites
+const pinnedSites = [
+  { 
+    "url": "https://www.google.com", 
+    "name": "Google" 
+  },
+  { 
+    "url": "https://www.youtube.com", 
+    "name": "YouTube" 
+  },
+  { 
+    "url": "https://www.wikipedia.org", 
+    "name": "Wikipedia" 
+  }
+];
+
+// Function to load pinned sites
+function loadPinnedSites() {
+  const pinnedSitesContainer = document.getElementById("pinnedSitesContainer");
+  pinnedSitesContainer.innerHTML = ""; 
+
+  pinnedSites.forEach(site => {
+    const siteDiv = document.createElement("div");
+    siteDiv.classList.add("pinned-site");
+    siteDiv.onclick = () => window.open(site.url, '_blank'); 
+
+    const siteInnerDiv = document.createElement("div");
+    siteInnerDiv.classList.add("pinned-site-inner");
+
+    const siteLink = document.createElement("a");
+    siteLink.href = site.url;
+    siteLink.textContent = site.name;
+
+    // Fetch favicon
+    const linkElement = document.createElement('link');
+    linkElement.rel = 'icon';
+    linkElement.href = site.url + '/favicon.ico';
+    document.head.appendChild(linkElement);
+
+    // Create image element and set src to linkElement.href
+    const siteImage = document.createElement("img");
+    siteImage.src = linkElement.href;
+    siteImage.onerror = () => { 
+      siteImage.src = 'default_favicon.png'; // Use a default favicon
+    };
+
+    siteInnerDiv.appendChild(siteImage); 
+
+    siteDiv.appendChild(siteInnerDiv);
+    siteDiv.appendChild(siteLink); 
+
+    pinnedSitesContainer.appendChild(siteDiv);
+  });
+}
+
+// Load pinned sites on page load
+loadPinnedSites(); 
+
+</script>
+
+</body>
+</html>
